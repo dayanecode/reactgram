@@ -98,10 +98,11 @@ const update = async(req, res) => {
 
     const user = await User.findById(new mongoose.Types.ObjectId(reqUser._id)).select("-password")
 
+    // Verifica se o nome chegou
     if(name) {
         user.name = name;
     }
-
+    // Verifica se a senha chegou
     if (password) {
         // Generate password hash
         const salt = await bcrypt.genSalt();
@@ -110,14 +111,15 @@ const update = async(req, res) => {
         user.password = passwordHash
     }
    
+    // Verifica se veio o profile image
     if(profileImage) {
         user.profileImage = profileImage
     }
-
+    // Verifica se chegou alguma bio
     if (bio) {
         user.bio = bio
     }
-
+    // mando o usuário de volta
     await user.save()
 
     res.status(200).json(user);
