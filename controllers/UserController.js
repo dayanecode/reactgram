@@ -85,12 +85,12 @@ const getCurrentUser = async (req, res) => {
 };
 
 // Update an user
-const update = async(req, res) => {
-    const {name, password, bio} = req.body
+const update = async (req, res) => {
+    const { name, password, bio } = req.body
 
     let profileImage = null
-    
-    if(req.file) {
+
+    if (req.file) {
         profileImage = req.file.filename
     }
 
@@ -99,7 +99,7 @@ const update = async(req, res) => {
     const user = await User.findById(new mongoose.Types.ObjectId(reqUser._id)).select("-password")
 
     // Verifica se o nome chegou
-    if(name) {
+    if (name) {
         user.name = name;
     }
     // Verifica se a senha chegou
@@ -110,9 +110,9 @@ const update = async(req, res) => {
 
         user.password = passwordHash
     }
-   
+
     // Verifica se veio o profile image
-    if(profileImage) {
+    if (profileImage) {
         user.profileImage = profileImage
     }
     // Verifica se chegou alguma bio
@@ -123,8 +123,33 @@ const update = async(req, res) => {
     await user.save()
 
     res.status(200).json(user);
+};
+
+// Get user by id
+const getUserById = async (req, res) => {
+
+    const { id } = req.params
+
+    try {
+        const user = await User.findById(new mongoose.Types.ObjectId(id)).select(
+            "-password"
+        );
+
+        // Check if user exists
+        if (!user) {
+            res.status(404).json({ errors: ["Usuário não encontrado."] });
+            return;
+        }
+
+        res.status(200).json(user)
+    } catch (error) {
+        res.status(404).json({ errors: ["Usuário não encontrado."] });
+        return;
+    }
+
 
 };
+
 
 
 module.exports = {
@@ -132,4 +157,6 @@ module.exports = {
     login,
     getCurrentUser,
     update,
+    getUserById,
 };
+
