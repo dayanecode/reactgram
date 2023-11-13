@@ -2,6 +2,8 @@ const Photo = require("../models/Photo")
 // Para fazer as operações do banco de dados
 const mongoose = require("mongoose");
 const User = require("../models/User");
+const fs = require('fs');
+const path = require('path');
 
 // Criação das funções de fotos: Inserção, Atualização, Exclusão.
 
@@ -37,7 +39,7 @@ const insertPhoto = async (req, res) => {
     res.status(201).json(newPhoto);
 }
 
-// Remove a photo from DB
+// Remove a photo from DB and physical directory
 const deletePhoto = async (req, res) => {
     const { id } = req.params
 
@@ -52,16 +54,28 @@ const deletePhoto = async (req, res) => {
             return;
         }
 
-        // Check photo belongs to user (verifica se a foto pertence ao usuário)
+        // Check if photo belongs to the user (verifica se a foto pertence ao usuário)
         if (!photo.userId.equals(reqUser.id)) {
             res
                 .status(422)
                 .json({
                     errors: ["Ocorreu um erro, por favor tente novamente mais tarde."],
                 })
+            return;
         }
 
+        // Constrói o caminho para a foto no diretório de photos
+        const photoPath = path.join(__dirname, '../uploads/photos', photo.image);
+
+        // Check if the file exists before attempting to delete it
+        if (fs.existsSync(photoPath)) {
+            // Remove the photo from the physical directory
+            fs.unlinkSync(photoPath);
+        }
+
+        // Remove the photo from the database
         await Photo.findByIdAndDelete(photo._id);
+
 
         res
             .status(200)
