@@ -67,15 +67,35 @@ const deletePhoto = async (req, res) => {
         // Constrói o caminho para a foto no diretório de photos
         const photoPath = path.join(__dirname, '../uploads/photos', photo.image);
 
-        // Check if the file exists before attempting to delete it
-        if (fs.existsSync(photoPath)) {
-            // Remove the photo from the physical directory
-            fs.unlinkSync(photoPath);
+
+        // MOVE A PHOTO PARA A PASTA EXPURGO EM VEZ DE EXCLUÍ-LA PERMANENTEMENTE
+        // Construct the path to the "expurgo" directory
+        const expurgoPath = path.join(__dirname, '../uploads/expurgo');
+
+        // Check if the "expurgo" directory exists; if not, create it
+        if (!fs.existsSync(expurgoPath)) {
+            fs.mkdirSync(expurgoPath);
         }
+
+        // Construct the new path for the photo in the "expurgo" directory
+        const expurgoPhotoPath = path.join(expurgoPath, photo.image);
+
+        // Move the photo to the "expurgo" directory
+        fs.renameSync(photoPath, expurgoPhotoPath);
+
+        // CRIAR A FUNÇÃO QUE VAI MOVER OS DADOS DA PHOTO PARA A TABELA Photo_Expurgo do DATABASE 
+
 
         // Remove the photo from the database
         await Photo.findByIdAndDelete(photo._id);
 
+        
+        // Exclui a foto DEFINITIVAMENTE do diretório do diretório de fotos
+        // // Check if the file exists before attempting to delete it
+        // if (fs.existsSync(photoPath)) {
+        //     // Remove the photo from the physical directory
+        //     fs.unlinkSync(photoPath);
+        // }
 
         res
             .status(200)
