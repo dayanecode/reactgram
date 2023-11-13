@@ -13,22 +13,24 @@ const imageStorage = multer.diskStorage({
             fs.mkdirSync(uploadsFolder)
         }
 
-        let folder = ""
-
         // Verifica se a base URL inclui users and photos
         if (req.baseUrl.includes("users")) {
-            let folder = path.join(__dirname, '../uploads/users');
-            if (!fs.existsSync(folder)) {
-                fs.mkdirSync(folder);
+            let folderUser = path.join(__dirname, '../uploads/users');
+            if (!fs.existsSync(folderUser)) {
+                fs.mkdirSync(folderUser);
             }
+            cb(null, `${folderUser}`);
+            
         } else if (req.baseUrl.includes("photos")) {
-            let folder = path.join(__dirname, '../uploads/photos');
-            if (!fs.existsSync(folder)) {
-                fs.mkdirSync(folder);
+            let folderPhotos = path.join(__dirname, '../uploads/photos');
+            if (!fs.existsSync(folderPhotos)) {
+                fs.mkdirSync(folderPhotos);
             }
-        }
+            cb(null, `${folderPhotos}`);
 
-        cb(null, `uploads/${folder}`);
+        } else {
+            cb(new Error("Não foi possível determinar o diretório de destino!"));
+        }
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname));
