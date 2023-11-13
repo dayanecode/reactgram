@@ -11,6 +11,7 @@ const validate = require("../middlewares/handleValidation")
 const { imageUpload } = require("../middlewares/imageUpload");
 
 // Routes
+// Precisa estar autenticado, adicionar uma imagem só, validate para imprimir os erros pra gente:
 router.post("/", authGuard, imageUpload.single("image"), photoInsertValidation(), validate, insertPhoto)
 
 module.exports = router;
