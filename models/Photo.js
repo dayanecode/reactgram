@@ -1,7 +1,8 @@
 const mongoose = require("mongoose")
 const { Schema } = mongoose
 
-const userSchema = new Schema(
+
+const photoSchema = new Schema(
     {
         image: String,
         title: String,
