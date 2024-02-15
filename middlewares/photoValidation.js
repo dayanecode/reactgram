@@ -32,7 +32,20 @@ const photoUpdateValidation = () => {
 }
 
 
+const commentValidation = () => {
+    return [
+        body("comment")
+        .isString()
+        .withMessage("O comentário é obrigatório.")
+        .notEmpty()
+        .withMessage("O comentário não pode ser vazio!")
+    ];
+}
+
+// Search photos
+
 module.exports = {
     photoInsertValidation,
     photoUpdateValidation,
+    commentValidation,
 }
