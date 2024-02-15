@@ -219,6 +219,51 @@ const likePhoto = async(req, res) => {
 
 };
 
+// Comment functionality
+const commentPhoto = async(req, res) => {
+    const {id} = req.params
+    const {comment} = req.body
+
+    const reqUser = req.user
+    const user = await User.findById(reqUser._id);
+
+    const photo = await Photo.findById(id);
+
+    // Check if photo exists
+    if (!photo) {
+        res.status(404).json({errors: ["Foto não encontrada"]});
+        return
+    }
+
+    // Put comment in the array comments
+
+    const userComment = {
+        comment,
+        userName: user.name,
+        userImage: user.profileImage,
+        userId: user._id
+    }
+    // insiro o resultado na foto
+    photo.comments.push(userComment)
+
+    // Salvo a foto
+    await photo.save();
+
+    res.status(200).json({
+        comment: userComment,
+        message: "O comentário foi adicionado com sucesso!"
+
+    })
+}
+
+// Search photos
+const searchPhotos = async(req, res) => {
+    const {q} = req.query;
+    // Qualquer lugar que contenha a expressão que está sendo passada
+    const photos = await Photo.find({ title: new RegExp(q, "i") }).exec();
+
+    res.status(200).json(photos);
+}
 
 module.exports = {
     insertPhoto,
@@ -228,5 +273,7 @@ module.exports = {
     getPhotoById,
     updatePhoto,
     likePhoto,
+    commentPhoto,
+    searchPhotos,
 }
 
